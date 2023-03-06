@@ -8,25 +8,27 @@ This repository contains the ROS workspace for the Autonomous Kart Project.
 - Install ROS Melodic or ROS Noetic. Follow the steps from [here](https://linuxopsys.com/topics/install-ros-noetic-on-ubuntu)
 - run the following command:
 ```bash
+git clone https://github.com/ahmedmbakr/autonomous_kart_ros_vis.git
+cd autonomous_kart_ros_vis
 catkin_make
 ```
 - The last command should generate two folders: `build` and `devel`
 - run the following command:
 ```bash
+sudo apt-get install ros-noetic-rosbridge-suite
 source devel/setup.bash
 roslaunch rosbridge_server rosbridge_websocket.launch
 ```
 - The expected output is the following image:
 ![rosbridge_server](imgs/rosbridge_command_expected_output.png)
-- Download the testrosbag from this link: [testrosbag](https://github.com/IPNL-POLYU/UrbanNavDataset/blob/master/README.md#urbannav-hk-medium-urban-1). Refer to [this link](https://github.com/IPNL-POLYU/UrbanNavDataset/blob/master/README.md) for the complete sensor setup and rosbag description
+- Download the testrosbag from this link: [testrosbag](https://www.dropbox.com/s/8vwkero6boujtzb/UrbanNav-HK_CHTunnel-20210518_sensors.bag?dl=0). Refer to [this link](https://github.com/IPNL-POLYU/UrbanNavDataset/blob/master/README.md) for the complete sensor setup and rosbag description
 - Update line 26 in `talker2.py` with the path to the downloaded rosbag
 - Download and install anaconda from [here](https://repo.anaconda.com/archive/Anaconda3-2022.10-Linux-x86_64.sh)
 - Install `Anaconda` using the following commands:
 ```bash
-sudo apt install ./Anaconda3-2022.10-Linux-x86_64.sh
+bash ./Anaconda3-2022.10-Linux-x86_64.sh
 conda env create -f environment.yaml
 conda activate kart_env
-```
 ```
 - Open another terminal and run the following command:
 ```bash
@@ -37,3 +39,19 @@ rosrun first_package talker2.py
 ![rosbridge_server](imgs/talker2_ros_run_expected_output.png)
 - Open `foxglove`, choose `Open Connection` and write the following URL: `ws://localhost:9090` under `Rosbridge (Ros1 & 2) tab, as shown in the attached image:
 ![rosbridge_server](imgs/foxglove_url.png)
+
+## Normal Run:
+
+This section describes how you normally run the program after you have followed the installation steps successfully.
+
+- In a new terminal, execute the following commands:
+```bash
+source devel/setup.bash
+roslaunch rosbridge_server rosbridge_websocket.launch
+```
+- In a new terminal, execute the following command to run the rosnode
+```bash
+cd autonomous_kart_ros_vis
+conda activate kart_env
+rosrun first_package talker2.py
+```
