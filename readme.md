@@ -5,7 +5,8 @@ This repository contains the ROS workspace for the Autonomous Kart Project.
 ## Installation Steps:
 
 - It is better to follow the steps using Ubuntu 18.04 LTS or Ubuntu 20.04 LTS. In case you are a windows machine user, you can use Ubuntu 20.04 LTS on Windows 10 using WSL2 or install a virtual machine with Ubuntu 20.04 LTS
-- Install ROS Melodic or ROS Noetic. Follow the steps from [here](https://linuxopsys.com/topics/install-ros-noetic-on-ubuntu)
+- From Ubuntu 20.04, install ROS Melodic or ROS Noetic. Follow the steps from [here](https://linuxopsys.com/topics/install-ros-noetic-on-ubuntu)
+- For Mac users, follow the [following video](https://www.youtube.com/watch?v=zF7Pbq4Puvg&amp;ab_channel=BorisMeinardus&ab_channel=BorisMeinardus) to install ROS on your machine natively
 - run the following command:
 ```bash
 git clone https://github.com/ahmedmbakr/autonomous_kart_ros_vis.git
@@ -55,3 +56,9 @@ cd autonomous_kart_ros_vis
 conda activate kart_env
 rosrun first_package talker2.py
 ```
+
+## Known Issues:
+- If you face error when running any `sudo` command in Ubunu, refer to the [following video](https://youtu.be/jZGHtuxpaP4) to solve the issue, thanks to Kate Sanborn
+
+## Maintainers
+- Ahmed Bakr (ambakr@crimson.ua.edu) or (ahmed.m.ali.bakr@gmail.com)
