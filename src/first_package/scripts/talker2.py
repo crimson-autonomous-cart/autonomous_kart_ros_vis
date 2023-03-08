@@ -4,6 +4,8 @@ import rospy
 from std_msgs.msg import String, Int32, Int32MultiArray, Float32MultiArray
 from sensor_msgs.msg import PointCloud2, Temperature
 from first_package.msg import kartTemperatures
+from visualization_msgs.msg import Marker, MarkerArray
+from geometry_msgs.msg import Point
 import rosbag
 import random
 
@@ -15,6 +17,7 @@ def talker():
     temp_pub2 = rospy.Publisher('temperatures_std', Temperature, queue_size=1)
     temp_pub3 = rospy.Publisher('temperatures_int', Int32, queue_size=1)
     temp_arr_pub = rospy.Publisher('temperatures', Int32MultiArray, queue_size=1)
+    trajectory_pub = rospy.Publisher('markers/trajectory', MarkerArray, queue_size=1)
 
     rospy.init_node('talker', anonymous=False)
     rate = rospy.Rate(10) # 10hz
@@ -28,6 +31,7 @@ def talker():
         print("published frame number:", idx, " with timestamp: ", t)
         # rospy.loginfo(msg.data)
         lidar_pub.publish(msg)
+        trajectory_pub.publish(trajectoryPath(t, "velodyne", 20, 0.5, 0.2, 2.0, 1.8))
 
         actual_speed = float(random.randint(45, 50)) # Randomly change of speed as a test
         target_speed = actual_speed + 10.3
@@ -62,8 +66,37 @@ def publish_speeds(speed_pub: rospy.Publisher, actual_speed: float, target_speed
     speed_msg.data = [actual_speed, target_speed]
     speed_pub.publish(speed_msg)
 
+def trajectoryPath(timestamp, frame_id, amount, separation, size, vehicle_length, vehicle_height):
+    markerArray = MarkerArray()
+    for i in range(amount):
+        marker = Marker()
+        marker.header.stamp = timestamp
+        marker.header.frame_id = frame_id
+        marker.id = i
+        marker.lifetime = rospy.Duration(0.1)
+        marker.ns = "my_namespace"
+        marker.type = Marker.POINTS
+        marker.pose.orientation.w = 0.0
+        marker.scale.x = size
+        marker.scale.y = size
+        marker.scale.z = size
+        marker.color.a = 1.0
+        marker.color.r = 0.0
+        marker.color.g = 1.0
+        marker.color.b = 0.0
+        point = Point()
+        point.x = 0.0
+        point.y = vehicle_length + (i * separation)
+        point.z = -vehicle_height
+        marker.points
+        marker.points.append(point)
+        markerArray.markers.append(marker)      
+    return markerArray
+
+
 if __name__ == '__main__':
-    RECORDED_ROS_BAG_PATH = '/home/bakr/Downloads/UrbanNav-HK_TST-20210517_sensors.bag'
+    #RECORDED_ROS_BAG_PATH = '/home/bakr/Downloads/UrbanNav-HK_TST-20210517_sensors.bag'
+    RECORDED_ROS_BAG_PATH = 'UrbanNav-HK_CHTunnel-20210518_sensors.bag'
     try:
         talker()
     except rospy.ROSInterruptException as e:
