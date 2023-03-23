@@ -4,6 +4,8 @@ import rospy
 from std_msgs.msg import String, Int32, Int32MultiArray, Float32MultiArray
 from sensor_msgs.msg import PointCloud2, Temperature
 from first_package.msg import kartTemperatures
+from first_package.msg import kartPID
+from first_package.msg import kartCurrents
 import rosbag
 import random
 
@@ -15,6 +17,10 @@ def talker():
     temp_pub2 = rospy.Publisher('temperatures_std', Temperature, queue_size=1)
     temp_pub3 = rospy.Publisher('temperatures_int', Int32, queue_size=1)
     temp_arr_pub = rospy.Publisher('temperatures', Int32MultiArray, queue_size=1)
+    # PID test topics
+    PID_pub = rospy.Publisher('PID', kartPID, queue_size=1)
+    # Current test topics
+    current_pub = rospy.Publisher('currents', kartCurrents, queue_size = 1)
 
     rospy.init_node('talker', anonymous=False)
     rate = rospy.Rate(10) # 10hz
@@ -36,12 +42,25 @@ def talker():
         if idx % 10 == 0: # change the temperature every 1 second
             motor_temperature = random.randint(70, 80) # Randomly change of temperature as a test
             cpu_temperature = random.randint(60, 80) # Randomly change of temperature as a test
-            publish_temperatures(temp_pub, temp_pub2, temp_pub3, temp_arr_pub, motor_temperature, cpu_temperature)        
+            publish_temperatures(temp_pub, temp_pub2, temp_pub3, temp_arr_pub, motor_temperature, cpu_temperature)    
+            
+        if idx % 10 == 0: # change the PID value every 1 second
+        	P = random.randint(0,5)
+        	I = random.randint(10,15)
+        	D = random.randint(20,25)
+        	publish_PID(PID_pub, P, I, D)
+        	
+        if idx % 10 == 0: # change the current value every 1 second
+        	steering_servo_current = random.randint(0,20) / 20.0
+        	brakes_servo_current = random.randint(0,20) / 20.0
+        	motor_DC_current = random.randint(0,20) / 20.0
+        	publish_currents(current_pub, steering_servo_current, brakes_servo_current, motor_DC_current)
 
         rate.sleep()
     bag.close()
 
 def publish_temperatures(temp_pub: rospy.Publisher, temp_pub2: rospy.Publisher, temp_pub3: rospy.Publisher, temp_arr_pub: rospy.Publisher, motor_temperature: int, cpu_temperature: int):
+
     temperature_msg = kartTemperatures()
     temperature_msg.motor_temperature = motor_temperature
     temperature_msg.cpu_temperature = cpu_temperature 
@@ -62,8 +81,22 @@ def publish_speeds(speed_pub: rospy.Publisher, actual_speed: float, target_speed
     speed_msg.data = [actual_speed, target_speed]
     speed_pub.publish(speed_msg)
 
+def publish_PID(PID_pub: rospy.Publisher, P: float, I: float, D: float):
+	PID_msg = kartPID()
+	PID_msg.P = P
+	PID_msg.I = I
+	PID_msg.D = D
+	PID_pub.publish(PID_msg)
+
+def publish_currents(current_pub: rospy.Publisher, steering_servo_current: float, brakes_servo_current: float, motor_DC_current: float):
+	current_msg = kartCurrents()
+	current_msg.steering_servo_current = steering_servo_current
+	current_msg.brakes_servo_current = brakes_servo_current
+	current_msg.motor_DC_current = motor_DC_current
+	current_pub.publish(current_msg)
+
 if __name__ == '__main__':
-    RECORDED_ROS_BAG_PATH = '/home/bakr/Downloads/UrbanNav-HK_TST-20210517_sensors.bag'
+    RECORDED_ROS_BAG_PATH = '/home/kart/Downloads/UrbanNav-HK_CHTunnel-20210518_sensors.bag'
     try:
         talker()
     except rospy.ROSInterruptException as e:
