@@ -6,6 +6,7 @@ from sensor_msgs.msg import PointCloud2, Temperature
 from first_package.msg import kartTemperatures
 from first_package.msg import kartPID
 from first_package.msg import kartCurrents
+from first_package.msg import kartMotorRPM
 import rosbag
 import random
 
@@ -21,6 +22,8 @@ def talker():
     PID_pub = rospy.Publisher('PID', kartPID, queue_size=1)
     # Current test topics
     current_pub = rospy.Publisher('currents', kartCurrents, queue_size = 1)
+    # Motor RPM test topics
+    motor_RPM_pub = rospy.Publisher('motor_RPM', kartMotorRPM, queue_size = 1)
 
     rospy.init_node('talker', anonymous=False)
     rate = rospy.Rate(10) # 10hz
@@ -55,6 +58,10 @@ def talker():
         	brakes_servo_current = random.randint(0,20) / 20.0
         	motor_DC_current = random.randint(0,20) / 20.0
         	publish_currents(current_pub, steering_servo_current, brakes_servo_current, motor_DC_current)
+
+        # change the motor RPM 10 times per second
+        motor_RPM = random.randint(1000,2000)
+        publish_motor_RPM(motor_RPM_pub, motor_RPM)
 
         rate.sleep()
     bag.close()
@@ -94,6 +101,11 @@ def publish_currents(current_pub: rospy.Publisher, steering_servo_current: float
 	current_msg.brakes_servo_current = brakes_servo_current
 	current_msg.motor_DC_current = motor_DC_current
 	current_pub.publish(current_msg)
+
+def publish_motor_RPM(motor_RPM_pub: rospy.Publisher, motor_RPM: int):
+    motor_RPM_msg = kartMotorRPM()
+    motor_RPM_msg.motor_RPM = motor_RPM
+    motor_RPM_pub.publish(motor_RPM_msg)
 
 if __name__ == '__main__':
     RECORDED_ROS_BAG_PATH = '/home/kart/Downloads/UrbanNav-HK_CHTunnel-20210518_sensors.bag'

@@ -49,6 +49,7 @@ add_message_files(
   kartSpeeds.msg
   kartPID.msg
   kartCurrents.msg
+  kartMotorRPM.msg
 )
 
 ## Generate services in the 'srv' folder
