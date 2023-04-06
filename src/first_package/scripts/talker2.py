@@ -9,6 +9,7 @@ from geometry_msgs.msg import Point
 from first_package.msg import kartPID
 from first_package.msg import kartCurrents
 from first_package.msg import kartMotorRPM
+from first_package.msg import kartLateralError
 import rosbag
 import random
 
@@ -28,6 +29,8 @@ class ROS_Vis_Publisher:
         self.current_pub = rospy.Publisher('currents', kartCurrents, queue_size = 1)
         # Motor RPM test topics
         self.motor_RPM_pub = rospy.Publisher('motor_RPM', kartMotorRPM, queue_size = 1)
+        # Lateral error test topics
+        self.lateral_error_pub = rospy.Publisher('lateral_error', kartLateralError, queue_size = 1)
 
     def talker(self):
         rospy.init_node('talker', anonymous=False)
@@ -61,6 +64,9 @@ class ROS_Vis_Publisher:
         motor_RPM = random.randint(1000,2000)
         self.publish_motor_RPM(self.motor_RPM_pub, motor_RPM)
 
+        # Lateral error Publisher
+        lateral_error = random.randint(0,5)
+        self.publish_lateral_error(self.lateral_error_pub, lateral_error)
 
 
     def publish_1_second_cyclic_function(self):
@@ -150,9 +156,13 @@ class ROS_Vis_Publisher:
             markerArray.markers.append(marker)      
         return markerArray
 
+    def publish_lateral_error(self, lateral_error_pub: rospy.Publisher, lateral_error: float):
+        lateral_error_msg = kartLateralError()
+        lateral_error_msg.lateral_error = lateral_error
+        lateral_error_pub.publish(lateral_error_msg)
 
 if __name__ == '__main__':
-    RECORDED_ROS_BAG_PATH = '/mnt/Ubuntu/UrbanNav-HK_TST-20210517_sensors.bag'
+    RECORDED_ROS_BAG_PATH = '/home/kart/Downloads/UrbanNav-HK_CHTunnel-20210518_sensors.bag'
     try:
         ros_vis_publisher = ROS_Vis_Publisher()
         ros_vis_publisher.talker()
