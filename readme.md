@@ -57,6 +57,43 @@ conda activate kart_env
 rosrun first_package talker2.py
 ```
 
+## Connecting to Real Velodyne Lidar
+The main steps are followed from [this link](http://wiki.ros.org/velodyne/Tutorials/Getting%20Started%20with%20the%20Velodyne%20VLP16)
+
+### General Information about the Lidar:
+ - Lidar IP address: 192.168.1.201
+ - Lidar UDP socket: 2368
+
+### Connecting to the lidar steps for the first time:
+ - Change your PC's ip address manually to be:
+    - IP: `192.168.1.xx`, where `xx` can be replaced with any number from 10 to 199
+    - Netmask: `255.255.255.0`
+    - Default Gateway: `192.168.1.1`
+ - Open a browser and try to connect to `192.168.1.201`, you should be able to see the lidar webpage
+ - Open a terminal window and do the following:
+    ```bash
+        cd THIS_REPOSITORY_ROOT_FOLDER/src
+        git clone https://github.com/ros-drivers/velodyne.git
+        cd ..
+        sudo apt-get install ros-noetic-velodyne
+        rosdep install --from-paths src --ignore-src --rosdistro noetic -y
+        catkin_make
+        ```
+ -  Test that the lidar is connected successfully and the ros node can read the data by executing the following:
+     ```bash
+        source devel/setup.bash
+        roslaunch velodyne_pointcloud VLP16_points.launch
+        rosnode list
+        rostopic echo /velodyne_points
+        ```
+ - To be able to run rosbridge with the velodyne ros lanuch file, edit the file: `src/velodyne/velodyne_pointcloud/launch/VLP16_points.launch` and add the following at the end just before `</launch>` command:
+     ```bash
+          <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch">
+            <arg name="port" value="9090" />
+         </include>
+        ```
+- Now run `roslaunch velodyne_pointcloud VLP16_points.launch` again and open foxglove to view the lidar data along with the other published data
+
 ## Known Issues:
 - If you face error when running any `sudo` command in Ubunu, refer to the [following video](https://youtu.be/jZGHtuxpaP4) to solve the issue, thanks to Kate Sanborn
 

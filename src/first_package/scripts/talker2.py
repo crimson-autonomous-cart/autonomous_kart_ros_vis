@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import rospy
+from sensor_msgs.msg import LaserScan
 from std_msgs.msg import String, Int32, Int32MultiArray, Float32MultiArray
 from sensor_msgs.msg import PointCloud2, Temperature
 from first_package.msg import kartTemperatures
@@ -14,7 +15,9 @@ import random
 
 class ROS_Vis_Publisher:
     def __init__(self) -> None:
-        self.lidar_pub = rospy.Publisher('velodyne_points', PointCloud2, queue_size=1)
+        # self.lidar_pub = rospy.Publisher('velodyne_points', PointCloud2, queue_size=1)
+        self.sub = rospy.Subscriber('/velodyne_points', LaserScan, self.lidar_callback) # TODO: AB: Try PointCloud2 instead of LaserScan to know the difference
+        self.lidar_timestamp = None
         self.speed_pub = rospy.Publisher('car_speeds', Float32MultiArray, queue_size=1)
         # Temperatures test topics
         self.temp_pub = rospy.Publisher('temperatures_custom', kartTemperatures, queue_size=1)
@@ -29,28 +32,36 @@ class ROS_Vis_Publisher:
         # Motor RPM test topics
         self.motor_RPM_pub = rospy.Publisher('motor_RPM', kartMotorRPM, queue_size = 1)
 
+    def lidar_callback(self, data):
+        self.lidar_timestamp = data.header.stamp
+        # Do something with the timestamp
+
     def talker(self):
         rospy.init_node('talker', anonymous=False)
         rate = rospy.Rate(10) # 10hz
-        bag = rosbag.Bag(RECORDED_ROS_BAG_PATH)
-        for idx, (topic, msg, t) in enumerate(bag.read_messages(topics=['/velodyne_points'])):
-            if idx < 75:
-                continue # The first 75 frames are not useful (The car is stationary)
+        # bag = rosbag.Bag(RECORDED_ROS_BAG_PATH)
+        # for idx, (topic, msg, t) in enumerate(bag.read_messages(topics=['/velodyne_points'])):
+            # if idx < 75:
+            #     continue # The first 75 frames are not useful (The car is stationary)
+        idx = 0
+        while True:
             if rospy.is_shutdown():
                 break
             # print(msg.data)
-            print("published frame number:", idx, " with timestamp: ", t)
+            # print("published frame number:", idx, " with timestamp: ", t)
             # rospy.loginfo(msg.data)
+            msg = None
             self.publish_100ms_cyclic_function(msg)
             if idx % 10 == 0:
                 self.publish_1_second_cyclic_function()          
 
             rate.sleep()
+            idx += 1
         bag.close()
 
     def publish_100ms_cyclic_function(self, lidar_msg):
-        self.lidar_pub.publish(lidar_msg)
-        # self.trajectory_pub.publish(trajectoryPath(t, "velodyne", 20, 0.5, 0.2, 2.0, 1.8)) # TODO: AB: To be replaced with the code from Andreas
+        # self.lidar_pub.publish(lidar_msg)
+        self.trajectory_pub.publish(self.trajectoryPath(self.lidar_timestamp, "velodyne", 20, 0.5, 0.2, 2.0, 1.8)) # TODO: AB: To be replaced with the code from Andreas
 
         # Speeds Publishers
         actual_speed = float(random.randint(45, 50)) # Randomly change of speed as a test
