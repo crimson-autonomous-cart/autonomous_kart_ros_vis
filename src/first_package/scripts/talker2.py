@@ -14,9 +14,9 @@ import rosbag
 import random
 
 class ROS_Vis_Publisher:
-    def __init__(self) -> None:
+    def __init__(self):
         # self.lidar_pub = rospy.Publisher('velodyne_points', PointCloud2, queue_size=1)
-        self.sub = rospy.Subscriber('/velodyne_points', LaserScan, self.lidar_callback) # TODO: AB: Try PointCloud2 instead of LaserScan to know the difference
+        self.sub = rospy.Subscriber('/velodyne_points', PointCloud2, self.lidar_callback)
         self.lidar_timestamp = None
         self.speed_pub = rospy.Publisher('car_speeds', Float32MultiArray, queue_size=1)
         # Temperatures test topics
@@ -91,7 +91,7 @@ class ROS_Vis_Publisher:
         motor_DC_current = random.randint(0,20) / 20.0
         self.publish_currents(self.current_pub, steering_servo_current, brakes_servo_current, motor_DC_current)
 
-    def publish_temperatures(self, temp_pub: rospy.Publisher, temp_pub2: rospy.Publisher, temp_pub3: rospy.Publisher, temp_arr_pub: rospy.Publisher, motor_temperature: int, cpu_temperature: int):
+    def publish_temperatures(self, temp_pub, temp_pub2, temp_pub3, temp_arr_pub, motor_temperature, cpu_temperature):
         # Temperature publishers
         temperature_msg = kartTemperatures()
         temperature_msg.motor_temperature = motor_temperature
@@ -110,26 +110,26 @@ class ROS_Vis_Publisher:
 
 
 
-    def publish_speeds(self, speed_pub: rospy.Publisher, actual_speed: float, target_speed: float):
+    def publish_speeds(self, speed_pub, actual_speed, target_speed):
         speed_msg = Float32MultiArray()
         speed_msg.data = [actual_speed, target_speed]
         speed_pub.publish(speed_msg)
 
-    def publish_PID(self, PID_pub: rospy.Publisher, P: float, I: float, D: float):
+    def publish_PID(self, PID_pub, P, I, D):
         PID_msg = kartPID()
         PID_msg.P = P
         PID_msg.I = I
         PID_msg.D = D
         PID_pub.publish(PID_msg)
 
-    def publish_currents(self, current_pub: rospy.Publisher, steering_servo_current: float, brakes_servo_current: float, motor_DC_current: float):
+    def publish_currents(self, current_pub, steering_servo_current, brakes_servo_current, motor_DC_current):
         current_msg = kartCurrents()
         current_msg.steering_servo_current = steering_servo_current
         current_msg.brakes_servo_current = brakes_servo_current
         current_msg.motor_DC_current = motor_DC_current
         current_pub.publish(current_msg)
 
-    def publish_motor_RPM(self, motor_RPM_pub: rospy.Publisher, motor_RPM: int):
+    def publish_motor_RPM(self, motor_RPM_pub, motor_RPM):
         motor_RPM_msg = kartMotorRPM()
         motor_RPM_msg.motor_RPM = motor_RPM
         motor_RPM_pub.publish(motor_RPM_msg)
