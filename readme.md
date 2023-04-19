@@ -91,6 +91,9 @@ The main steps are followed from [this link](http://wiki.ros.org/velodyne/Tutori
           <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch">
             <arg name="port" value="9090" />
          </include>
+         
+         <include file="$(find realsense2_camera)/launch/rs_camera.launch">
+         </include>
         ```
 - Now run `roslaunch velodyne_pointcloud VLP16_points.launch` again and open foxglove to view the lidar data along with the other published data
 
