@@ -47,12 +47,12 @@ This section describes how you normally run the program after you have followed 
 
 - In a new terminal, execute the following commands:
 ```bash
+cd autonomous_kart_ros_vis
 source devel/setup.bash
-roslaunch rosbridge_server rosbridge_websocket.launch
+roslaunch velodyne_pointcloud VLP16_points.launch
 ```
 - In a new terminal, execute the following command to run the rosnode
 ```bash
-cd autonomous_kart_ros_vis
 conda activate kart_env
 rosrun first_package talker2.py
 ```
