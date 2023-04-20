@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import rospy
-from std_msgs.msg import String, Int32, Int32MultiArray, Float32MultiArray
+from std_msgs.msg import String, Int32, Int32MultiArray, Float32MultiArray, Bool
 from sensor_msgs.msg import PointCloud2, Temperature
 from first_package.msg import kartTemperatures
 from visualization_msgs.msg import Marker, MarkerArray
@@ -31,6 +31,12 @@ class ROS_Vis_Publisher:
         self.motor_RPM_pub = rospy.Publisher('motor_RPM', kartMotorRPM, queue_size = 1)
         # Lateral error test topics
         self.lateral_error_pub = rospy.Publisher('lateral_error', kartLateralError, queue_size = 1)
+        # Temperature range test topic
+        self.temp_range_pub = rospy.Publisher('temperature_range', Bool, queue_size = 1)
+        
+        # temperature parameters
+        rospy.set_param('min_temp_limit', 72)
+        rospy.set_param('max_temp_limit', 75)
 
     def talker(self):
         rospy.init_node('talker', anonymous=False)
@@ -73,6 +79,7 @@ class ROS_Vis_Publisher:
         motor_temperature = random.randint(70, 80) # Randomly change of temperature as a test
         cpu_temperature = random.randint(60, 80) # Randomly change of temperature as a test
         self.publish_temperatures(self.temp_pub, self.temp_pub2, self.temp_pub3, self.temp_arr_pub, motor_temperature, cpu_temperature)
+        self.publish_temperature_range(self.temp_range_pub, cpu_temperature)
 
         # PID Publishers
         P = random.randint(0,5)
@@ -160,6 +167,13 @@ class ROS_Vis_Publisher:
         lateral_error_msg = kartLateralError()
         lateral_error_msg.lateral_error = lateral_error
         lateral_error_pub.publish(lateral_error_msg)
+
+    def publish_temperature_range(self, temp_range_pub: rospy.Publisher, cpu_temperature: int):
+        minTemp = rospy.get_param('min_temp_limit')
+        maxTemp = rospy.get_param('max_temp_limit')
+
+        in_range = cpu_temperature >= minTemp and cpu_temperature <= maxTemp
+        temp_range_pub.publish(Bool(in_range))
 
 if __name__ == '__main__':
     RECORDED_ROS_BAG_PATH = '/home/kart/Downloads/UrbanNav-HK_CHTunnel-20210518_sensors.bag'
