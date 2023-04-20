@@ -2,7 +2,7 @@
 
 import rospy
 from std_msgs.msg import String, Int32, Int32MultiArray, Float32MultiArray, Bool
-from sensor_msgs.msg import PointCloud2, Temperature
+from sensor_msgs.msg import PointCloud2, Temperature, NavSatFix
 from first_package.msg import kartTemperatures
 from visualization_msgs.msg import Marker, MarkerArray
 from geometry_msgs.msg import Point
@@ -33,6 +33,8 @@ class ROS_Vis_Publisher:
         self.lateral_error_pub = rospy.Publisher('lateral_error', kartLateralError, queue_size = 1)
         # Temperature range test topic
         self.temp_range_pub = rospy.Publisher('temperature_range', Bool, queue_size = 1)
+        # GPS test topic
+        self.GPS_pub = rospy.Publisher('GPS', NavSatFix, queue_size = 1)
         
         # temperature parameters
         rospy.set_param('min_temp_limit', 72)
@@ -73,6 +75,12 @@ class ROS_Vis_Publisher:
         # Lateral error Publisher
         lateral_error = random.randint(0,5)
         self.publish_lateral_error(self.lateral_error_pub, lateral_error)
+
+        # GPS Publisher
+        latitude = 33.215775
+        longitude = -87.538261
+        altitude = 0
+        self.publish_GPS(self.GPS_pub, latitude, longitude, altitude)
 
 
     def publish_1_second_cyclic_function(self):
@@ -174,6 +182,13 @@ class ROS_Vis_Publisher:
 
         in_range = cpu_temperature >= minTemp and cpu_temperature <= maxTemp
         temp_range_pub.publish(Bool(in_range))
+
+    def publish_GPS(self, GPS_pub: rospy.Publisher, latitude: float, longitude: float, altitude: float):
+        GPS_msg = NavSatFix()
+        GPS_msg.latitude = latitude
+        GPS_msg.longitude = longitude
+        GPS_msg.altitude = altitude
+        GPS_pub.publish(GPS_msg)
 
 if __name__ == '__main__':
     RECORDED_ROS_BAG_PATH = '/home/kart/Downloads/UrbanNav-HK_CHTunnel-20210518_sensors.bag'
