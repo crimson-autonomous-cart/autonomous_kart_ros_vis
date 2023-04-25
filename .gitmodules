@@ -1,0 +1,3 @@
+[submodule "src/perception/scripts/yolov5"]
+	path = src/perception/scripts/yolov5
+	url = https://github.com/ahmedmbakr/yolov5
