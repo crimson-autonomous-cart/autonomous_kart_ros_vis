@@ -22,6 +22,7 @@ class ROS_Cones_Test_Publisher:
         for idx, (topic, msg, t) in enumerate(bag.read_messages(topics=[CAMERA_PUBLISHER_TOPIC])):
             if rospy.is_shutdown():
                 break
+            self.camera_pub.publish(msg)
             cv_image = bridge.imgmsg_to_cv2(msg, desired_encoding="bgr8")
             # cv2.imwrite("imgs/frame%d.jpg" % idx, cv_image)
             print("published frame number:", idx, " with timestamp: ", t)
